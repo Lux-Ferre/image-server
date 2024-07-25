@@ -1,3 +1,4 @@
 flask
 shortuuid
 python-dotenv
+requests
