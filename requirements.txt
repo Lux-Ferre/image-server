@@ -2,3 +2,5 @@ flask
 shortuuid
 python-dotenv
 requests
+pyperclip
+plyer
