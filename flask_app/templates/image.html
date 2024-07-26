@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 
 {% block head %}
-  {{ super() }}
-  <link href="{{ url_for('static', filename='assets/css/image_styles.css') }}" rel="stylesheet">
+    {{ super() }}
+    <link href="{{ url_for('static', filename='assets/css/image_styles.css') }}" rel="stylesheet">
+    <meta property="og:title" content="Luxshot Screenshot" />
+    <meta property="og:description" content="{{ date }}" />
+    <meta property="og:image" content="{{ url_for('static', filename=filename) }}" />
 {% endblock %}
 
 {% block title %}Index{% endblock %}
