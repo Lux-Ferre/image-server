@@ -5,6 +5,6 @@
 }
 
 #image_container > img{
-    max-height: 79vh;
-    max-width: 94vw;
+    max-height: 79svh;
+    max-width: 94svw;
 }
