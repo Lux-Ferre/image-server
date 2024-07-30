@@ -1,7 +1,23 @@
-from flask import render_template, abort
+import secrets
+import os
+
+from functools import wraps
+
+from flask import render_template, abort, request, redirect, url_for, flash, session
 from flask_app import app
 
 from repo import SQLiteDB
+
+
+def require_login(f):
+	@wraps(f)
+	def login_function(*args, **kwargs):
+		if 'auth_token' not in session:
+			abort(401)
+		if session.get('auth_token') not in app.config['TOKENS']:
+			abort(403)
+		return f(*args, **kwargs)
+	return login_function
 
 
 @app.route("/")
@@ -23,3 +39,31 @@ def get_image(image_uuid):
 	date = date_time.split(" ")[0]
 
 	return render_template("image.html", filename=f"images/{filename}", date=date)
+
+
+@app.route('/gallery', methods=['GET'])
+@require_login
+def gallery():
+	return render_template("gallery.html")
+
+
+@app.route('/login', methods=['GET'])
+def login_page():
+	return render_template("login.html")
+
+
+@app.route('/login', methods=['POST'])
+def login():
+	stored_username = os.getenv('LOGIN_USERNAME')
+	stored_password = os.getenv('LOGIN_PASSWORD')
+	username = request.form['username']
+	password = request.form['password']
+
+	if username == stored_username and password == stored_password:
+		auth_token = secrets.token_hex(16)
+		app.config['TOKENS'].append(auth_token)
+		session['auth_token'] = auth_token
+		return redirect(url_for('gallery'))
+	else:
+		flash('Invalid username or password')
+		return redirect(url_for('login_page'))
