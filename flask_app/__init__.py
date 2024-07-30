@@ -9,3 +9,4 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 from flask_app import views
+from flask_app import errors
