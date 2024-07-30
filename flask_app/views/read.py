@@ -3,7 +3,7 @@ import os
 
 from functools import wraps
 
-from flask import render_template, abort, request, redirect, url_for, flash, session
+from flask import render_template, abort, request, redirect, url_for, flash, session, make_response
 from flask_app import app
 
 from repo import SQLiteDB
@@ -63,7 +63,10 @@ def login():
 		auth_token = secrets.token_hex(16)
 		app.config['TOKENS'].append(auth_token)
 		session['auth_token'] = auth_token
-		return redirect(url_for('gallery'))
+		response = make_response(redirect(url_for('gallery')))
+		response.set_cookie('username', username, httponly=False)
+
+		return response
 	else:
 		flash('Invalid username or password')
 		return redirect(url_for('login_page'))
