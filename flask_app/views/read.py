@@ -3,7 +3,7 @@ import os
 
 from functools import wraps
 
-from flask import render_template, abort, request, redirect, url_for, flash, session, make_response
+from flask import render_template, abort, request, redirect, url_for, flash, session, make_response, jsonify
 from flask_app import app
 
 from repo import SQLiteDB
@@ -45,6 +45,17 @@ def get_image(image_uuid):
 @require_login
 def gallery():
 	return render_template("gallery.html")
+
+
+@app.route('/get_uuids', methods=['GET'])
+@require_login
+def get_uuids():
+	with SQLiteDB(app.config["DB_PATH"]) as db:
+		result = db.get_all_uuids()
+
+	uuids = [uuid[0] for uuid in result]
+
+	return jsonify(uuids), 200
 
 
 @app.route('/login', methods=['GET'])

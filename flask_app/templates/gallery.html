@@ -4,9 +4,8 @@
 {% block content %}
 <div class="container-fluid">
     <div class="row">
-        <div class="col text-center">
-            <p>This is a gallery.</p>
-        </div>
+        <div id="link_container" class="col text-center"></div>
     </div>
 </div>
+<script src="{{ url_for('static', filename='assets/js/gallery.js') }}"></script>
 {% endblock %}
