@@ -70,3 +70,18 @@ def login():
 	else:
 		flash('Invalid username or password')
 		return redirect(url_for('login_page'))
+
+
+@app.route('/logout')
+def logout():
+	if 'auth_token' in session and session.get('auth_token') in app.config['TOKENS']:
+		app.config['TOKENS'].remove(session.get('auth_token'))
+
+	response = make_response(redirect(url_for('index')))
+
+	session.pop('auth_token', None)
+
+	response.set_cookie('username', '', expires=0)
+	response.set_cookie('session', '', expires=0)
+
+	return response
