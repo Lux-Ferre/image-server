@@ -4,7 +4,7 @@ import shortuuid
 from datetime import datetime
 from sqlite3 import Error as SQLiteError
 
-from flask import request, jsonify, render_template
+from flask import request, jsonify, render_template, abort
 from flask_app import app
 
 from repo import SQLiteDB
@@ -59,11 +59,11 @@ def get_image(image_uuid):
 	with SQLiteDB(app.config["DB_PATH"]) as db:
 		image_data = db.get_image_data(image_uuid)
 
-	if image_data is not None:
-		filename = image_data["filename"]
-		date_time = image_data["date"]
-	else:
-		return jsonify({"error": "Image not found"}), 404
+	if image_data is None:
+		abort(404)
+
+	filename = image_data["filename"]
+	date_time = image_data["date"]
 
 	date = date_time.split(" ")[0]
 
