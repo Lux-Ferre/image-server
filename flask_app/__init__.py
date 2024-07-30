@@ -8,5 +8,6 @@ load_dotenv()
 app = Flask(__name__)
 app.config.from_object(Config)
 
-from flask_app import views
-from flask_app import errors
+from flask_app.views import read
+from flask_app.views import upload
+from flask_app.views import errors
