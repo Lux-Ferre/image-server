@@ -3,9 +3,19 @@
 {% block title %}Gallery{% endblock %}
 {% block content %}
 <div class="container-fluid">
-    <div class="row">
-        <div id="link_container" class="col text-center"></div>
-    </div>
+    <div id="link_container" class="row d-flex justify-content-around"></div>
 </div>
+<template id="thumbnail_card_template">
+    <div class="col-auto text-center">
+        <div class="card">
+            <a href="">
+                <img src="" class="card-img-top" alt="" width="300" height="186">
+            </a>
+            <div class="card-body">
+                <h5 class="card-title"></h5>
+            </div>
+        </div>
+    </div>
+</template>
 <script src="{{ url_for('static', filename='assets/js/gallery.js') }}"></script>
 {% endblock %}

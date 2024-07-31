@@ -3,3 +3,4 @@ class Config:
 	ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 	UPLOAD_DIR = "flask_app/static/images"
 	DOMAIN = "https://img.luxferre.dev"
+	IMAGES_PATH = ["static/images"]

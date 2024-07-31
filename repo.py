@@ -52,9 +52,9 @@ class SQLiteDB:
         }
         return data
 
-    def get_all_uuids(self):
+    def get_all_images(self):
         cursor = self.connection.cursor()
-        query = f"SELECT uuid FROM images"
+        query = f"SELECT uuid, filename, datetime FROM images"
         result = cursor.execute(query).fetchall()
 
         return result

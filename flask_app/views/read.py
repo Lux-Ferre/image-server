@@ -2,6 +2,7 @@ import secrets
 import os
 
 from functools import wraps
+from flask_image_resizer.core import resized_img_src
 
 from flask import render_template, abort, request, redirect, url_for, flash, session, make_response, jsonify
 from flask_app import app
@@ -47,15 +48,22 @@ def gallery():
 	return render_template("gallery.html")
 
 
-@app.route('/get_uuids', methods=['GET'])
+@app.route('/get_images', methods=['GET'])
 @require_login
-def get_uuids():
+def get_all_images():
 	with SQLiteDB(app.config["DB_PATH"]) as db:
-		result = db.get_all_uuids()
+		result = db.get_all_images()
 
-	uuids = [uuid[0] for uuid in result]
+	images = []
 
-	return jsonify(uuids), 200
+	for image in result:
+		images.append({
+			"uuid": image[0],
+			"url": resized_img_src(image[1], width=300, height=186),
+			"date": image[2][:10],
+		})
+
+	return jsonify(images), 200
 
 
 @app.route('/login', methods=['GET'])

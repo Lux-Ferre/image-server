@@ -4,3 +4,4 @@ python-dotenv
 requests
 pyperclip
 plyer
+flask_image_resizer
