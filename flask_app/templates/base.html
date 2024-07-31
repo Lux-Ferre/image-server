@@ -20,13 +20,17 @@
                 Luxshot
             </strong>
 	    </a>
-      <div id="nav_login">
+      <div id="nav_login" class="nav_link">
           <a href="{{ url_for('login_page') }}">
               <i class="fa-solid fa-arrow-right-to-bracket fa-lg"></i>
               login
           </a>
       </div>
-      <div id="nav_logout" class="d-none">
+      <div id="nav_logout" class="d-none nav_link">
+          <a href="{{ url_for('gallery') }}">
+              <i class="fa-regular fa-image fa-lg"></i>
+              gallery
+          </a>
           <a href="{{ url_for('logout') }}">
               <i class="fa-solid fa-arrow-right-from-bracket fa-lg"></i>
               logout

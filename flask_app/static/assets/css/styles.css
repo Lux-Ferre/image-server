@@ -1,0 +1,7 @@
+.nav_link > a{
+    margin-left: 10px;
+}
+
+.nav_link > a:link{
+    text-decoration: none;
+}
