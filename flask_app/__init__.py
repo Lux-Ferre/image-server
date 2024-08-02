@@ -20,6 +20,8 @@ images = Images(app)
 
 with SQLiteDB(app.config["DB_PATH"]) as db:
 	db.init_db()
+	if app.config["FLUSH_TOKENS_ON_STARTUP"]:
+		db.flush_tokens()
 
 from flask_app.views import read
 from flask_app.views import upload

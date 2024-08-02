@@ -119,3 +119,11 @@ class SQLiteDB:
         params = (ident,)
         cursor.execute(query, params)
         self.connection.commit()
+
+    def flush_tokens(self):
+        cursor = self.connection.cursor()
+        query = f"DELETE FROM session_tokens WHERE 1"
+        cursor.execute(query)
+        count = cursor.execute("SELECT changes()").fetchone()[0]
+        print(f"{count} session tokens have been flushed from the database.")
+        self.connection.commit()
