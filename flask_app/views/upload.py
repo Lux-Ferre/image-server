@@ -1,7 +1,7 @@
 import os
 import shortuuid
 
-from datetime import datetime
+from datetime import datetime, UTC
 from sqlite3 import Error as SQLiteError
 
 from flask import request, jsonify
@@ -36,7 +36,7 @@ def upload():
 		filename = f"{file.filename}"
 		file_path = os.path.join(app.config["UPLOAD_DIR"], filename)
 		file.save(file_path)
-		date = datetime.utcnow()
+		date = datetime.now(UTC)
 		try:
 			with SQLiteDB(app.config["DB_PATH"]) as db:
 				db.add_image(filename, image_uuid, date)
