@@ -5,6 +5,7 @@ from flask import Flask
 from flask_image_resizer import Images
 
 from config import Config
+from repo import SQLiteDB
 
 load_dotenv()
 
@@ -17,7 +18,8 @@ if not app.secret_key:
 
 images = Images(app)
 
-app.config['TOKENS'] = []
+with SQLiteDB(app.config["DB_PATH"]) as db:
+	db.init_db()
 
 from flask_app.views import read
 from flask_app.views import upload

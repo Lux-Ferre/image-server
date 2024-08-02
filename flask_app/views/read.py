@@ -1,6 +1,7 @@
 import secrets
 import os
 
+from datetime import datetime, timedelta, UTC
 from functools import wraps
 from flask_image_resizer.core import resized_img_src
 
@@ -15,7 +16,9 @@ def require_login(f):
 	def login_function(*args, **kwargs):
 		if 'auth_token' not in session:
 			abort(401)
-		if session.get('auth_token') not in app.config['TOKENS']:
+		with SQLiteDB(app.config["DB_PATH"]) as db:
+			valid_token = db.is_valid_token(session['auth_token'])
+		if not valid_token:
 			abort(403)
 		return f(*args, **kwargs)
 	return login_function
@@ -37,7 +40,7 @@ def get_image(image_uuid):
 	filename = image_data["filename"]
 	date_time = image_data["date"]
 
-	date = date_time.split(" ")[0]
+	date = date_time.strftime("%Y-%m-%d")
 
 	return render_template("image.html", filename=f"images/{filename}", date=date)
 
@@ -60,7 +63,7 @@ def get_all_images():
 		images.append({
 			"uuid": image[0],
 			"url": resized_img_src(image[1], width=300, height=186),
-			"date": image[2][:10],
+			"date": image[2].strftime("%Y-%m-%d"),
 		})
 
 	return jsonify(images), 200
@@ -80,7 +83,9 @@ def login():
 
 	if username == stored_username and password == stored_password:
 		auth_token = secrets.token_hex(16)
-		app.config['TOKENS'].append(auth_token)
+		expiry = datetime.now(UTC) + timedelta(days=1)
+		with SQLiteDB(app.config["DB_PATH"]) as db:
+			db.add_token(username, auth_token, expiry)
 		session['auth_token'] = auth_token
 		response = make_response(redirect(url_for('gallery')))
 		response.set_cookie('username', username, httponly=False)
@@ -93,8 +98,12 @@ def login():
 
 @app.route('/logout')
 def logout():
-	if 'auth_token' in session and session.get('auth_token') in app.config['TOKENS']:
-		app.config['TOKENS'].remove(session.get('auth_token'))
+	if 'auth_token' in session:
+		token = session.get('auth_token')
+		with SQLiteDB(app.config["DB_PATH"]) as db:
+			valid_token = db.is_valid_token(token)
+			if valid_token:
+				db.delete_token(token)
 
 	response = make_response(redirect(url_for('index')))
 
