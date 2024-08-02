@@ -1,4 +1,5 @@
 import sqlite3
+import bcrypt
 
 from datetime import datetime, UTC
 
@@ -82,33 +83,39 @@ class SQLiteDB:
         return result
 
     def add_token(self, username: str, token: str, expiry: datetime):
+        salt = bcrypt.gensalt()
+        hashed_token = bcrypt.hashpw(token.encode('utf-8'), salt)
+
         cursor = self.connection.cursor()
-        query = f"INSERT INTO session_tokens (token, username, expiry) VALUES (?, ?, ?)"
-        params = (token, username, expiry)
-        cursor.execute(query, params)
+        query = f"INSERT INTO session_tokens (token, username, expiry) VALUES (?, ?, ?) RETURNING id"
+        params = (hashed_token, username, expiry)
+        ident = cursor.execute(query, params).fetchone()[0]
         self.connection.commit()
 
-    def find_token(self, token: str):
+        return ident
+
+    def find_token(self, ident: int) -> tuple[bytes, datetime]:
         cursor = self.connection.cursor()
-        query = f"SELECT username, expiry FROM session_tokens WHERE token=?"
-        params = (token,)
+        query = f"SELECT token, expiry FROM session_tokens WHERE id=?"
+        params = (ident,)
         result = cursor.execute(query, params).fetchone()
 
         return result
 
-    def is_valid_token(self, token: str):
-        token_data = self.find_token(token)
+    def is_valid_token(self, ident: int, token: str):
+        token_data = self.find_token(ident)
         if token_data is None:
             return False
         if token_data[1] < datetime.now(UTC):
-            self.delete_token(token)
+            self.delete_token(ident)
             return False
 
-        return True
+        hashed_token = token_data[0]
+        return bcrypt.checkpw(token.encode('utf-8'), hashed_token)
 
-    def delete_token(self, token: str):
+    def delete_token(self, ident: int):
         cursor = self.connection.cursor()
-        query = f"DELETE FROM session_tokens WHERE token=?"
-        params = (token,)
+        query = f"DELETE FROM session_tokens WHERE id=?"
+        params = (ident,)
         cursor.execute(query, params)
         self.connection.commit()

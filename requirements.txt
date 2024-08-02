@@ -5,3 +5,4 @@ requests
 pyperclip
 plyer
 flask_image_resizer
+bcrypt

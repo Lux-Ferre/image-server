@@ -17,7 +17,7 @@ def require_login(f):
 		if 'auth_token' not in session:
 			abort(401)
 		with SQLiteDB(app.config["DB_PATH"]) as db:
-			valid_token = db.is_valid_token(session['auth_token'])
+			valid_token = db.is_valid_token(session['session_id'], session['auth_token'])
 		if not valid_token:
 			abort(403)
 		return f(*args, **kwargs)
@@ -83,12 +83,15 @@ def login():
 
 	if username == stored_username and password == stored_password:
 		auth_token = secrets.token_hex(16)
-		expiry = datetime.now(UTC) + timedelta(days=1)
+		expiry = datetime.now(UTC) + timedelta(days=30)
 		with SQLiteDB(app.config["DB_PATH"]) as db:
-			db.add_token(username, auth_token, expiry)
+			ident = db.add_token(username, auth_token, expiry)
 		session['auth_token'] = auth_token
+		session['auth_token_expiry'] = expiry
+		session['username'] = username
+		session['session_id'] = ident
 		response = make_response(redirect(url_for('gallery')))
-		response.set_cookie('username', username, httponly=False)
+		response.set_cookie('username', username, httponly=False, expires=expiry)
 
 		return response
 	else:
@@ -100,10 +103,11 @@ def login():
 def logout():
 	if 'auth_token' in session:
 		token = session.get('auth_token')
+		ident = session.get('session_id')
 		with SQLiteDB(app.config["DB_PATH"]) as db:
-			valid_token = db.is_valid_token(token)
+			valid_token = db.is_valid_token(ident, token)
 			if valid_token:
-				db.delete_token(token)
+				db.delete_token(ident)
 
 	response = make_response(redirect(url_for('index')))
 
