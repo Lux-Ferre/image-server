@@ -77,7 +77,7 @@ class SQLiteDB:
 
     def get_all_images(self):
         cursor = self.connection.cursor()
-        query = f"SELECT uuid, filename, datetime FROM images"
+        query = f"SELECT uuid, filename, datetime FROM images ORDER BY datetime DESC"
         result = cursor.execute(query).fetchall()
 
         return result
