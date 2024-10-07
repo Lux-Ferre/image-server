@@ -9,3 +9,7 @@
 nav{
     margin-bottom: 5px;
 }
+
+.navbar{
+	background-color: var(--bs-body-bg);
+}
