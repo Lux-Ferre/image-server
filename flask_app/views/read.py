@@ -62,7 +62,7 @@ def get_all_images():
 	for image in result:
 		images.append({
 			"uuid": image[0],
-			"url": resized_img_src(image[1], width=300, height=186),
+			"url": resized_img_src(image[1], width=300, height=186, mode="crop", enlarge=True),
 			"date": image[2].strftime("%Y-%m-%d"),
 		})
 
